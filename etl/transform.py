@@ -81,7 +81,7 @@ def run(data: dict):
             'userName': post['ownerUsername'],
             'providerId': post["id"],
             'nohash_caption': remove_hashtags(post["caption"]),
-            'takenAtDate': post["timestamp"],
+            'takenAtDate': datetime.strptime(post["timestamp"],'%Y-%m-%dT%H:%M:%S.0000000'),
             'created_at': hlp.datetime_formatter(datetime.now()),
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
@@ -96,6 +96,14 @@ def run(data: dict):
         #     post_rec['comment_count']: int(desc["shortcode_media"]["edge_media_to_parent_comment"]["count"])
 
         post_images = []
+        if post["type"] == "Image":
+            post_images.append({
+                'url': post["displayUrl"],
+                'width': post["dimensionsWidth"],
+                'height': post["dimensionsHeight"]
+            })
+            post_rec['images'] = post_images
+
         for media in post["childPosts"]:
             if media["type"] == "Image":
                 post_images.append({
