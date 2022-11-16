@@ -1,0 +1,11 @@
+requests==2.26.0
+python-dotenv==0.20.0
+unidecode
+numpy
+pandas
+#
+uvicorn
+fastapi
+mysql-connector-python
+pymongo
+python-multipart
