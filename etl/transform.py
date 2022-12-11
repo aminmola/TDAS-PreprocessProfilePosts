@@ -73,21 +73,21 @@ def run(data: dict):
     for post in data["latestPosts"]:
         post_rec = {
             'source': "profile",
-            'accountProviderId': post["ownerId"],
+            'accountProviderId': int(post["ownerId"]),
             'code': post["shortCode"],
             'caption': post["caption"],
             'cleaned_caption': cleaning(post["caption"]),
             'like_count': post["likesCount"],
             'userName': post['ownerUsername'],
-            'providerId': post["id"],
+            'providerId': int(post["id"]),
             'nohash_caption': remove_hashtags(post["caption"]),
-            'takenAtDate': datetime.strptime(post["timestamp"],'%Y-%m-%dT%H:%M:%S.0000000'),
+            'takenAtDate': datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000'),
             'created_at': hlp.datetime_formatter(datetime.now()),
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
         }
         if 'locationName' in list(post.keys()):
-            post_rec['location'] = post["locationName"]
+            post_rec['loc'] = post["locationName"]
 
         # 'profileImage': desc['owner']['profile_pic_url'],
         # 'fullName': desc['owner']['full_name'],
@@ -120,7 +120,8 @@ def run(data: dict):
         post_rec['profile_image_busy'] = False
         post_rec['post_image_busy'] = False
         post_rec['filtering_image_busy'] = False
-        posts.append(post_rec)
+        if post_images:
+            posts.append(post_rec)
     return posts
 
 

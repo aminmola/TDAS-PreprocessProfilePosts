@@ -10,12 +10,12 @@ class PostModel(Mongo):
 def run(data):
     post_model = PostModel()
     for d in data:
-        post_model.insert_one(d)
+        a = post_model.find_one({"providerId": d["providerId"]})
+        if not a:
+            post_model.insert_one(d)
 
 # def run(data):
 #     post_model = PostModel()
 #     for d in data:
 #         post_model.update_upsert({'_id': d[1]},
 #                                  {'$set': {"cleaned_caption": d[0]}})
-
-
