@@ -86,6 +86,14 @@ def run(data: dict):
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
         }
+
+        # if post["timestamp"][-1] == "Z":
+        #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.000Z')
+        # elif post["timestamp"][-1] == "0":
+        #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
+        # else :
+        #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"].split("+")[0], '%Y-%m-%dT%H:%M:%S')
+
         if 'locationName' in list(post.keys()):
             post_rec['loc'] = post["locationName"]
 
@@ -192,5 +200,3 @@ def run1(data: dict):
         post_rec['filtering_image_busy'] = False
         return post_rec
 
-# def run(data):
-#     return [[cleaning(x['caption']), x['_id']] for x in data]

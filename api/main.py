@@ -14,20 +14,6 @@ from etl.load import run as load_run
 app = FastAPI()
 
 
-# class Base(BaseModel):
-#     graphql: dict
-#
-#     @classmethod
-#     def __get_validators__(cls):
-#         yield cls.validate_to_json
-#
-#     @classmethod
-#     def validate_to_json(cls, value):
-#         if isinstance(value, str):
-#             return cls(**json.loads(value))
-#         return value
-
-
 @app.post("/set_mongo")
 async def set_mongo(data: dict):
     if data:
@@ -63,25 +49,6 @@ async def set_mongo_online(data: dict):
     else:
         # log.warning(f'we have no records')
         return {'status': 4, 'warning': f'we have no records'}
-
-
-# @app.post("/get_data")
-# async def get_data():
-#     data = extract.run()
-#     if data:
-#         parsed_data = transform.run(data)
-#         for d in parsed_data:
-#             d['_id'] = str(d['_id'])
-#         return {'status': 'success', "data": parsed_data}
-
-
-# @app.post("/preprocessing_manual_set")
-# async def manual_set(caption):
-#     record = [
-#         {'caption': caption}
-#     ]
-#     parsed_data = transform.run(record)
-#     return {'status': 'success', "data": parsed_data}
 
 
 @app.get("/")
