@@ -2,6 +2,13 @@ import re
 from datetime import datetime
 from unidecode import unidecode
 import utils.helper as hlp
+from utils.mongo import Mongo
+
+
+class AccountModel(Mongo):
+    _connection_name = 'mongo_connection1'
+    _collection_name = 'accounts'
+    _db_name = 'data_pipline'
 
 
 def cleaning(caption: str):
@@ -69,8 +76,30 @@ def remove_hashtags(caption: str):
 
 
 def run(data: dict):
+    account_model = AccountModel()
     posts = []
+    k = 0
     for post in data["latestPosts"]:
+        if k == 0:
+            pre_account = account_model.find_one({"accountProviderId": int(post["ownerId"])})
+            if not pre_account:
+                account = {
+                    'accountProviderId': int(post["ownerId"]),
+                    'userName': post['ownerUsername'],
+                    'lastTakenAtDate': datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000'),
+                    'lastPostCreated': hlp.datetime_formatter(datetime.now()),
+                    'fullName': data['fullName'],
+                    'profileImage': data['profilePicUrl'],
+                    'PostCodes': []
+                }
+            else:
+                account = pre_account
+                account['lastTakenAtDate']: datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
+                account['lastPostCreated']: hlp.datetime_formatter(datetime.now())
+                account['profileImage']: data['profilePicUrl']
+            k += 1
+
+        account['PostCodes'].append(post["shortCode"])
         post_rec = {
             'source': "profile",
             'accountProviderId': int(post["ownerId"]),
@@ -86,7 +115,6 @@ def run(data: dict):
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
         }
-
         # if post["timestamp"][-1] == "Z":
         #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.000Z')
         # elif post["timestamp"][-1] == "0":
@@ -99,7 +127,6 @@ def run(data: dict):
 
         # 'profileImage': desc['owner']['profile_pic_url'],
         # 'fullName': desc['owner']['full_name'],
-
         # if 'edge_media_preview_comment' in list(desc["shortcode_media"].keys()):
         #     post_rec['comment_count']: int(desc["shortcode_media"]["edge_media_to_parent_comment"]["count"])
 
@@ -112,6 +139,7 @@ def run(data: dict):
             })
             post_rec['images'] = post_images
 
+        post["childPosts"] = []
         for media in post["childPosts"]:
             if media["type"] == "Image":
                 post_images.append({
@@ -125,12 +153,10 @@ def run(data: dict):
         #     url_list = desc['image_versions2']['candidates']
         #     post_images.append(sorted(url_list, key=lambda d: d['width'])[int(len(url_list) / 2)])
         #     post_rec['images'] = post_images
-        post_rec['profile_image_busy'] = False
-        post_rec['post_image_busy'] = False
-        post_rec['filtering_image_busy'] = False
         if post_images:
             posts.append(post_rec)
-    return posts
+
+    return posts, account
 
 
 def run1(data: dict):
@@ -199,4 +225,3 @@ def run1(data: dict):
         post_rec['post_image_busy'] = False
         post_rec['filtering_image_busy'] = False
         return post_rec
-

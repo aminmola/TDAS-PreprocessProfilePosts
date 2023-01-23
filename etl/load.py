@@ -7,9 +7,15 @@ class PostModel(Mongo):
     _db_name = 'data_pipline'
 
 
-def run(data):
+class AccountModel(Mongo):
+    _connection_name = 'mongo_connection1'
+    _collection_name = 'accounts'
+    _db_name = 'data_pipline'
+
+
+def run(data, account):
+    account_model = AccountModel()
     post_model = PostModel()
     for d in data:
-        # a = post_model.find_one({"providerId": d["providerId"]})
-        # if not a:
         post_model.insert_one(d)
+    account_model.update_upsert({"accountProviderId": account["accountProviderId"]}, {"$set":account})

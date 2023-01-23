@@ -5,6 +5,7 @@ import etl.load as load
 import etl.transform as transform
 from utils.logger import Logger
 
+
 # log = Logger("preprocessing")
 # os.environ['TZ'] = 'UTC'
 
@@ -14,11 +15,8 @@ def run(data):
     Extract, transform and load Data
     """
     if data:
-        parsed_data = transform.run(data)
-        load.run(data=parsed_data)
-
-
-
+        parsed_data, account = transform.run(data)
+        load.run(data=parsed_data, account=account)
 
     # else:
     #     log.error(f"Extract data failed")
