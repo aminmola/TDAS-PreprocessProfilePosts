@@ -94,11 +94,10 @@ def run(data: dict):
                 }
             else:
                 account = pre_account
-                account['lastTakenAtDate']: datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
-                account['lastPostCreated']: hlp.datetime_formatter(datetime.now())
-                account['profileImage']: data['profilePicUrl']
+                account['lastTakenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
+                account['lastPostCreated'] = hlp.datetime_formatter(datetime.now())
+                account['profileImage'] = data["profilePicUrl"]
             k += 1
-
         account['PostCodes'].append(post["shortCode"])
         post_rec = {
             'source': "profile",
@@ -119,7 +118,7 @@ def run(data: dict):
         #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.000Z')
         # elif post["timestamp"][-1] == "0":
         #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
-        # else :
+        # else:
         #     post_rec['takenAtDate'] = datetime.strptime(post["timestamp"].split("+")[0], '%Y-%m-%dT%H:%M:%S')
 
         if 'locationName' in list(post.keys()):
@@ -138,8 +137,6 @@ def run(data: dict):
                 'height': post["dimensionsHeight"]
             })
             post_rec['images'] = post_images
-
-        post["childPosts"] = []
         for media in post["childPosts"]:
             if media["type"] == "Image":
                 post_images.append({
@@ -155,8 +152,19 @@ def run(data: dict):
         #     post_rec['images'] = post_images
         if post_images:
             posts.append(post_rec)
-
+    account['PostCodes'] = list(set(account['PostCodes']))
     return posts, account
+
+
+def run_online(data: dict):
+    posts = []
+    for post in data["latestPosts"]:
+        post_rec = {
+            'caption': post["caption"],
+            'cleaned_caption': cleaning(post["caption"])
+        }
+        posts.append(post_rec)
+    return posts
 
 
 def run1(data: dict):

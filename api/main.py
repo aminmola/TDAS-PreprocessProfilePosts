@@ -7,7 +7,7 @@ import requests
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, root_path)
-from etl.transform import run as runt
+from etl.transform import run as run_online
 from startup import run
 from etl.load import run as load_run
 
@@ -32,7 +32,7 @@ async def set_mongo_online(data: dict):
     if data:
         try:
             k = 0
-            posts = runt(data=data)
+            posts, account = run_online(data=data)
             url = "http://192.168.110.45:10004/category_manual_set"
             for post in posts:
                 params = {"caption": f"{post['cleaned_caption']}"}
@@ -40,7 +40,7 @@ async def set_mongo_online(data: dict):
                 if vec.json()['data'][0]['CategoryId'] > 0:
                     k = k + 1
             if k > (len(posts) / 2) - 1:
-                load_run(posts)
+                load_run(posts, account)
                 return {'status': 1, 'explanation': "yup! it was a cloth shop."}
             else:
                 return {'status': 2, 'explanation': "Nope! it was not a cloth shop."}
