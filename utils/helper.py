@@ -1,11 +1,6 @@
 import re
-import os
-import time
 import utils.config as cfg
 from datetime import datetime
-
-os.environ['TZ'] = 'UTC'
-
 
 def row2dict(row):
     d = {}

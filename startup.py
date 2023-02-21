@@ -16,7 +16,8 @@ def run(data):
     """
     if data:
         parsed_data, account = transform.run(data)
-        load.run(data=parsed_data, account=account)
+        b = load.run(data=parsed_data, account=account)
+        return b
 
     # else:
     #     log.error(f"Extract data failed")

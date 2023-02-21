@@ -5,3 +5,4 @@ uvicorn
 fastapi
 pymongo
 python-multipart
+pytz~=2022.7.1

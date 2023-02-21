@@ -3,6 +3,7 @@ from datetime import datetime
 from unidecode import unidecode
 import utils.helper as hlp
 from utils.mongo import Mongo
+import pytz
 
 
 class AccountModel(Mongo):
@@ -27,7 +28,8 @@ def cleaning(caption: str):
     5 - eradicate the hashtag in the middle of caption : ...
     6 - ...
     """
-
+    if not caption:
+        return ""
     # Emoji Remover
     emoji_pattern = re.compile("["
                                u"\U0001F600-\U0001F64F"  # emoticons
@@ -87,7 +89,7 @@ def run(data: dict):
                     'accountProviderId': int(post["ownerId"]),
                     'userName': post['ownerUsername'],
                     'lastTakenAtDate': datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000'),
-                    'lastPostCreated': hlp.datetime_formatter(datetime.now()),
+                    'lastPostCreated': datetime.now(pytz.timezone("IRAN")),
                     'fullName': data['fullName'],
                     'profileImage': data['profilePicUrl'],
                     'PostCodes': []
@@ -95,7 +97,7 @@ def run(data: dict):
             else:
                 account = pre_account
                 account['lastTakenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
-                account['lastPostCreated'] = hlp.datetime_formatter(datetime.now())
+                account['lastPostCreated'] = datetime.now(pytz.timezone("IRAN"))
                 account['profileImage'] = data["profilePicUrl"]
             k += 1
         account['PostCodes'].append(post["shortCode"])
@@ -110,7 +112,8 @@ def run(data: dict):
             'providerId': int(post["id"]),
             'nohash_caption': remove_hashtags(post["caption"]),
             'takenAtDate': datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000'),
-            'created_at': hlp.datetime_formatter(datetime.now()),
+            'local_created_at': datetime.strptime(str(str(datetime.now(pytz.timezone("IRAN"))).split("+")[0].split(".")[0] + ".0000000").replace(" ","T"),'%Y-%m-%dT%H:%M:%S.0000000'),
+            'created_at': datetime.now(pytz.timezone("UTC")),
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
         }
@@ -132,7 +135,7 @@ def run(data: dict):
         post_images = []
         if post["type"] == "Image":
             post_images.append({
-                'url': post["displayUrl"],
+                'url': post["displayUrl"].replace("amp;", ""),
                 'width': post["dimensionsWidth"],
                 'height': post["dimensionsHeight"]
             })
@@ -140,7 +143,7 @@ def run(data: dict):
         for media in post["childPosts"]:
             if media["type"] == "Image":
                 post_images.append({
-                    'url': media["displayUrl"],
+                    'url': media["displayUrl"].replace("amp;", ""),
                     'width': media["dimensionsWidth"],
                     'height': media["dimensionsHeight"]
                 })

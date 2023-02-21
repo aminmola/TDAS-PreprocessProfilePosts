@@ -18,8 +18,8 @@ app = FastAPI()
 async def set_mongo(data: dict):
     if data:
         try:
-            run(data=data)
-            return {'status': "success"}
+            post_codes = run(data=data)
+            return {'status': "success" , "codes" : post_codes}
         except Exception as e:
             return {'status': "failure", 'error': e}
     else:
