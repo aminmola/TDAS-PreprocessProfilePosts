@@ -19,7 +19,7 @@ async def set_mongo(data: dict):
     if data:
         try:
             post_codes = run(data=data)
-            return {'status': "success" , "codes" : post_codes}
+            return {'status': "success", "codes": post_codes}
         except Exception as e:
             return {'status': "failure", 'error': e}
     else:
@@ -39,9 +39,9 @@ async def set_mongo_online(data: dict):
                 vec = requests.request("POST", url, params=params)
                 if vec.json()['data'][0]['CategoryId'] > 0:
                     k = k + 1
-            if k > (len(posts) / 2) - 1:
-                load_run(posts, account)
-                return {'status': 1, 'explanation': "yup! it was a cloth shop."}
+            if k > 0:
+                post_codes = load_run(posts, account)
+                return {'status': 1, 'explanation': "yup! it was a cloth shop.", "codes": post_codes}
             else:
                 return {'status': 2, 'explanation': "Nope! it was not a cloth shop."}
         except Exception as e:
