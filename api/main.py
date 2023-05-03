@@ -10,6 +10,7 @@ sys.path.insert(0, root_path)
 from etl.transform import run as run_online
 from startup import run
 from etl.load import run as load_run
+from etl.transform import tag_all_post
 
 app = FastAPI()
 
@@ -51,10 +52,26 @@ async def set_mongo_online(data: dict):
         return {'status': 4, 'warning': f'we have no records'}
 
 
+@app.post("/tag_all_post")
+async def all_tags_on_post(post: dict):
+    if post:
+        post_with_tags = tag_all_post(post=post)
+        return post_with_tags
+
+
+@app.post("/tag_all_post_raw_caption")
+async def tag_all_post_manual(caption: str):
+    post = dict()
+    if caption:
+        post["caption"] = caption
+        post_with_tags = tag_all_post(post=post)
+        return post_with_tags
+
+
 @app.get("/")
 async def read_index():
     return FileResponse('api/index.html')
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=10020)
+    uvicorn.run(app, host="0.0.0.0", port=10021)

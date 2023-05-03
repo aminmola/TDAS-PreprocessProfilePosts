@@ -4,6 +4,7 @@ from unidecode import unidecode
 import utils.helper as hlp
 from utils.mongo import Mongo
 import pytz
+import requests
 
 
 class AccountModel(Mongo):
@@ -112,7 +113,10 @@ def run(data: dict):
             'providerId': int(post["id"]),
             'nohash_caption': remove_hashtags(post["caption"]),
             'takenAtDate': datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000'),
-            'local_created_at': datetime.strptime(str(str(datetime.now(pytz.timezone("IRAN"))).split("+")[0].split(".")[0] + ".0000000").replace(" ","T"),'%Y-%m-%dT%H:%M:%S.0000000'),
+            'local_created_at': datetime.strptime(
+                str(str(datetime.now(pytz.timezone("IRAN"))).split("+")[0].split(".")[0] + ".0000000").replace(" ",
+                                                                                                               "T"),
+                '%Y-%m-%dT%H:%M:%S.0000000'),
             'created_at': datetime.now(pytz.timezone("UTC")),
             'fullName': data['fullName'],
             'profileImage': data['profilePicUrl']
@@ -236,3 +240,78 @@ def run1(data: dict):
         post_rec['post_image_busy'] = False
         post_rec['filtering_image_busy'] = False
         return post_rec
+
+
+def tag_all_post(post: dict):
+    ## input : post
+    ## output : post with all tags , ...
+    ########################################################PRICE#############################################################
+    post["cleaned_caption"] = cleaning(post["caption"])
+    url = "http://192.168.110.45:10009/price_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["Price"] = information["Price"]
+    post["PriceUnit"] = information["PriceUnit"]
+    post["OriginalPrice"] = information["OriginalPrice"]
+    ########################################################PRICE#############################################################
+    ########################################################SHIPPING#############################################################
+    url = "http://192.168.110.45:10011/shipping_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["BuyInPerson"] = information["BuyInPerson"]
+    post["ShippingPrice"] = information["ShippingPrice"]
+    post["ShippingLoc"] = information["ShippingLoc"]
+    post["ShippingOption"] = information["ShippingOption"]
+    post["ReturnOption"] = information["ReturnOption"]
+
+    ########################################################SHIPPING#############################################################
+    ########################################################CATEGORY & MATERIAL#############################################################
+    ###Category
+    url = "http://192.168.110.45:10004/category_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["CategoryId"] = information["CategoryId"]
+    post["GenderDetection"] = information["GenderDetection"]
+
+    ###MATERIAL
+    url = "http://192.168.110.45:10007/material_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["MaterialId"] = information["MaterialId"]
+    ########################################################CATEGORY & MATERIAL#############################################################
+
+    #########################################################BRAND & SIZE & ATTRIBUTE & COLOR #############################################################
+    ###BRAND
+
+    url = "http://192.168.110.45:10003/brand_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["BrandId"] = information["BrandId"]
+    ###SIZE
+    url = "http://192.168.110.45:10012/size_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["SizeId"] = information["SizeId"]
+
+    ###ATTRIBUTE
+    url = "http://192.168.110.45:10002/attribute_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["Attributes"] = information["Attributes"]
+
+    ###COLOR
+    url = "http://192.168.110.45:10005/color_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}"}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["ColorId"] = information["ColorId"]
+    ##########################################################BRAND & SIZE & ATTRIBUTE & COLOR#############################################################
+
+    return post
