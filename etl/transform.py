@@ -245,6 +245,14 @@ def run1(data: dict):
 def tag_all_post(post: dict):
     ## input : post
     ## output : post with all tags , ...
+    ########################################################SALE#############################################################
+    post["cleaned_caption"] = cleaning(post["caption"])
+    url = "http://192.168.110.45:10010/sale_manual_set"
+    params = {"caption": f"{post['cleaned_caption']}", 'id': 9}
+    vec = requests.request("POST", url, params=params)
+    information = vec.json()['data'][0]
+    post["IsSale"] = information[0]
+    ########################################################SALE#############################################################
     ########################################################PRICE#############################################################
     post["cleaned_caption"] = cleaning(post["caption"])
     url = "http://192.168.110.45:10009/price_manual_set"
