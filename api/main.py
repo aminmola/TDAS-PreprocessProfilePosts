@@ -1,18 +1,22 @@
 import os
 import sys
 import uvicorn
-from fastapi import FastAPI, Form
+from fastapi import FastAPI
 from starlette.responses import FileResponse
 import requests
+import threading
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, root_path)
 from etl.transform import run as run_online
 from startup import run
-from etl.load import run as load_run
 from etl.transform import tag_all_post
+from mail import Mail
+from utils.logger import Logger
 
 app = FastAPI()
+log = Logger("ProfPost")
+mail = Mail()
 
 
 @app.post("/set_mongo")
@@ -24,7 +28,6 @@ async def set_mongo(data: dict):
         except Exception as e:
             return {'status': "failure", 'error': e}
     else:
-        # log.warning(f'we have no records')
         return {'status': "empty", 'warning': f'we have no records'}
 
 
@@ -38,17 +41,28 @@ async def set_mongo_online(data: dict):
             for post in posts:
                 params = {"caption": f"{post['cleaned_caption']}"}
                 vec = requests.request("POST", url, params=params)
-                if vec.json()['data'][0]['CategoryId'] > 0:
+                if vec.json()['data'][0]['CategoryId'] > 6:
                     k = k + 1
-            if k > 0:
-                post_codes = load_run(posts, account)
-                return {'status': 1, 'explanation': "yup! it was a cloth shop.", "codes": post_codes}
+            if k / len(posts) > 0.49:
+                thread = threading.Thread(
+                    target=mail.send, args=(data['latestPosts'][0]['ownerUsername'], data, "it was a cloth shop"))
+                thread.start()
+                log.info("cloth shop", data=data, valid_post=k, count=len(posts))
+                return {'status': 1, 'explanation': "yup! it was a cloth shop."}
             else:
+                thread = threading.Thread(
+                    target=mail.send(data['latestPosts'][0]['ownerUsername'], data, "it was not a cloth shop"))
+                thread.start()
+                log.info("not a cloth shop", data=data, valid_post=k, count=len(posts))
                 return {'status': 2, 'explanation': "Nope! it was not a cloth shop."}
         except Exception as e:
+            thread = threading.Thread(
+                target=mail.send(data['latestPosts'][0]['ownerUsername'], data, "interrupted"))
+            thread.start()
+            log.info("interrupted", data=data)
             return {'status': 3, 'error': e, 'explanation': "the code has not been completed"}
     else:
-        # log.warning(f'we have no records')
+        log.info("data was empty", data=data)
         return {'status': 4, 'warning': f'we have no records'}
 
 

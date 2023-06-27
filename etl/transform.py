@@ -95,6 +95,10 @@ def run(data: dict):
                     'profileImage': data['profilePicUrl'],
                     'PostCodes': []
                 }
+                if "CategoryName" in data.keys():
+                    account["CategoryName"] = data["CategoryName"]
+                if "Biography" in data.keys():
+                    account["Bio"] = data["Biography"]
             else:
                 account = pre_account
                 account['lastTakenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')

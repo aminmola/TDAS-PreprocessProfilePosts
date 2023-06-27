@@ -8,7 +8,7 @@ class PostModel(Mongo):
 
 
 class OldPostModel(Mongo):
-    _connection_name = 'mongo_connection1'
+    _connection_name = 'mongo_connection2'
     _collection_name = 'old_posts'
     _db_name = 'data_pipline'
 

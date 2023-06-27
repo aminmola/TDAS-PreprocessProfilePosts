@@ -1,6 +1,6 @@
 FROM python:3.9-slim-buster
 
-WORKDIR /code
+WORKDIR ../code
 
 RUN apt-get update
 

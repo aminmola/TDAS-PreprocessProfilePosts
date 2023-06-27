@@ -70,6 +70,7 @@ class Logger(object):
                     "host": cfg.SPLUNK_HOST,
                     "source": cfg.SPLUNK_SOURCE,
                     "event": {
+                        "data"
                         "MESSAGE": msg,
                         "LEVEL": level,
                         "FUNC": func,
@@ -77,6 +78,12 @@ class Logger(object):
                         "SERVICE": self._app_name
                     }
                 }
+                if 'data' in kwargs:
+                    doc["event"]['data'] = kwargs['data']
+                if 'valid_post' in kwargs:
+                    doc["event"]['valid_post'] = kwargs['valid_post']
+                if 'count' in kwargs:
+                    doc["event"]['count'] = kwargs['count']
                 if cfg.LOGGER_TYPE == "persist":
                     response = requests.request("POST", self.url,
                                                 headers=self.headers,

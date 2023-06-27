@@ -1,8 +1,10 @@
 requests==2.26.0
 python-dotenv==0.20.0
-unidecode
-uvicorn
-fastapi
-pymongo
+unidecode~=1.3.6
+uvicorn~=0.21.1
+fastapi~=0.80.0
+pymongo~=4.2.0
 python-multipart
 pytz~=2022.7.1
+starlette~=0.19.1
+utils~=1.0.1

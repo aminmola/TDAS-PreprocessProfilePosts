@@ -29,4 +29,4 @@ query = {
 posts = post_model.collection.find(query, {"code": "$code"})
 for doc in posts:
     out.append(doc)
-print("ji")
+
