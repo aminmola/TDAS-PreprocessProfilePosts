@@ -16,7 +16,6 @@ from utils.logger import Logger
 
 app = FastAPI()
 log = Logger("ProfPost")
-mail = Mail()
 
 
 @app.post("/set_mongo")
@@ -34,16 +33,22 @@ async def set_mongo(data: dict):
 @app.post("/set_mongo_online")
 async def set_mongo_online(data: dict):
     if data:
+        mail = Mail()
         try:
             k = 0
             posts, account = run_online(data=data)
-            url = "http://192.168.110.45:10004/category_manual_set"
+            url = "http://192.168.110.45:10035/account_validator"
             for post in posts:
-                params = {"caption": f"{post['cleaned_caption']}"}
-                vec = requests.request("POST", url, params=params)
-                if vec.json()['data'][0]['CategoryId'] > 6:
+                params = {"caption": f"{post['cleaned_caption']}",
+                          "username": f"{data['username']}",
+                          "fullname": f"{data['fullName']}",
+                          "categoryname": f"{data['categoryName']}",
+                          "bio": f"{data['biography']}",
+                          }
+                vec = requests.request("GET", url, params=params)
+                if vec.json()['data'][0][0] == 1:
                     k = k + 1
-            if k / len(posts) > 0.49:
+            if k / len(posts) > 0.24:
                 thread = threading.Thread(
                     target=mail.send, args=(data['latestPosts'][0]['ownerUsername'], data, "it was a cloth shop"))
                 thread.start()
@@ -80,6 +85,81 @@ async def tag_all_post_manual(caption: str):
         post["caption"] = caption
         post_with_tags = tag_all_post(post=post)
         return post_with_tags
+
+
+@app.post("/size_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10012/size_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/shipping_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10011/shipping_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/attribute_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10002/attribute_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/price_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10009/price_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/brand_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10003/brand_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/category_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10004/category_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/color_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10005/color_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/material_manual_set")
+async def manual_set(caption: str):
+    url = "http://192.168.110.45:10007/material_manual_set"
+    params = {"caption": f"{caption}"}
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
+
+
+@app.post("/PostClassifier_manual_set")
+async def manual_set(caption: str, username: str, id: str):
+    url = "http://192.168.110.45:10035/manual_classifier"
+    params = {"caption": caption,
+              "username": username,
+              "id": id
+              }
+    vec = requests.request("POST", url, params=params)
+    return vec.json()
 
 
 @app.get("/")

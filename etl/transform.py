@@ -5,6 +5,7 @@ import utils.helper as hlp
 from utils.mongo import Mongo
 import pytz
 import requests
+import pandas as pd
 
 
 class AccountModel(Mongo):
@@ -74,6 +75,22 @@ def cleaning(caption: str):
     return caption
 
 
+block_words = pd.read_csv("BlockWords.csv")
+
+
+def clean_raw(caption: str):
+    """Cleaning raw caption
+    replace stop word with space
+    """
+    if not caption:
+        return ""
+    # Emoji Remover
+    for k in range(block_words.shape[0]):
+        if "#" + block_words.iloc[k][1] in caption:
+            caption = caption.replace("#" + block_words.iloc[k][1], '#***')
+    return caption
+
+
 def remove_hashtags(caption: str):
     return re.sub('#(_*[a-zآ-ی0-9]*_*)+', '', cleaning(caption))
 
@@ -95,10 +112,10 @@ def run(data: dict):
                     'profileImage': data['profilePicUrl'],
                     'PostCodes': []
                 }
-                if "CategoryName" in data.keys():
-                    account["CategoryName"] = data["CategoryName"]
-                if "Biography" in data.keys():
-                    account["Bio"] = data["Biography"]
+                if "categoryName" in data.keys():
+                    account["CategoryName"] = data["categoryName"]
+                if "biography" in data.keys():
+                    account["Bio"] = data["biography"]
             else:
                 account = pre_account
                 account['lastTakenAtDate'] = datetime.strptime(post["timestamp"], '%Y-%m-%dT%H:%M:%S.0000000')
@@ -110,7 +127,7 @@ def run(data: dict):
             'source': "profile",
             'accountProviderId': int(post["ownerId"]),
             'code': post["shortCode"],
-            'caption': post["caption"],
+            'caption': clean_raw(post["caption"]),
             'cleaned_caption': cleaning(post["caption"]),
             'like_count': post["likesCount"],
             'userName': post['ownerUsername'],
