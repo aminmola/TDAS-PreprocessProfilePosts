@@ -6,15 +6,20 @@ from email.mime.base import MIMEBase
 import json
 import os
 
+root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+import utils.config as cfg
+
+
 
 class Mail:
     def __init__(self, ):
-        self.sender_email = 'kukalamolaei@gmail.com'
-        self.receiver_email = '0059sharifloo@gmail.com'
-        self.receiver_email2 = 'saramoody1997@gmail.com'
-        self.password = 'poresbnqbpwlftdi'
-        self.smtp_server = 'smtp.gmail.com'
-        self.smtp_port = 587
+        self.sender_email = cfg.EMAIL_SENDER
+        self.receiver_email = cfg.EMAIL_RECEIVER1
+        self.receiver_email2 = cfg.EMAIL_RECEIVER2
+        self.password = cfg.EMAIL_PASSWORD
+        self.smtp_server = cfg.EMAIL_SMTP_SERVER
+        self.smtp_port = cfg.EMAIL_SMTP_PORT
         self.server = smtplib.SMTP(self.smtp_server, self.smtp_port)
         self.server.starttls()
         self.server.login(self.sender_email, self.password)

@@ -8,10 +8,11 @@ import threading
 
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, root_path)
+import utils.config as cfg 
 from etl.transform import run as run_online
 from startup import run
 from etl.transform import tag_all_post
-from mail import Mail
+from utils.mail import Mail
 from utils.logger import Logger
 
 app = FastAPI()
@@ -37,7 +38,7 @@ async def set_mongo_online(data: dict):
         try:
             k = 0
             posts, account = run_online(data=data)
-            url = "http://192.168.110.45:10010/account_validator"
+            url = cfg.ACCOUNT_VALIDATOR_URL
             for post in posts:
                 params = {"caption": f"{post['cleaned_caption']}",
                           "username": f"{data['username']}",

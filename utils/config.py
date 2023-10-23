@@ -1,9 +1,21 @@
-import os
-
 from dotenv import load_dotenv, find_dotenv
-
+import os
 root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 load_dotenv(find_dotenv(root_path + '/.env'))
+
+
+# ------------------------------
+# |     APP Config  |
+# ------------------------------
+BASE_SERVER_HOST = os.getenv('BASE_SERVER_HOST')
+ACCOUNT_VALIDATOR_URL = os.getenv('ACCOUNT_VALIDATOR_URL')
+EMAIL_SENDER = os.getenv('EMAIL_SENDER')
+EMAIL_RECEIVER1 = os.getenv('EMAIL_RECEIVER1')
+EMAIL_RECEIVER2 = os.getenv('EMAIL_RECEIVER2')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+EMAIL_SMTP_SERVER = os.getenv('EMAIL_SMTP_SERVER')
+EMAIL_SMTP_PORT = os.getenv('EMAIL_SMTP_PORT')
+
 
 # ------------------------------
 # |         SQL Server Config  |
