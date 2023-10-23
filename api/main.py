@@ -37,7 +37,7 @@ async def set_mongo_online(data: dict):
         try:
             k = 0
             posts, account = run_online(data=data)
-            url = "http://192.168.110.45:10035/account_validator"
+            url = "http://192.168.110.45:10010/account_validator"
             for post in posts:
                 params = {"caption": f"{post['cleaned_caption']}",
                           "username": f"{data['username']}",

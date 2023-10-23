@@ -10,7 +10,7 @@ import os
 class Mail:
     def __init__(self, ):
         self.sender_email = 'kukalamolaei@gmail.com'
-        self.receiver_email = 'm.aminmolaeiarpanahi@gmail.com'
+        self.receiver_email = '0059sharifloo@gmail.com'
         self.receiver_email2 = 'saramoody1997@gmail.com'
         self.password = 'poresbnqbpwlftdi'
         self.smtp_server = 'smtp.gmail.com'
